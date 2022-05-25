@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="base64.js"></script>
+        <script src="main.js"></script>
+        <title>1475</title>
+    </head>
+    <body>
+        <div style="height: 200px; margin-top: 100px">
+            <div style="width: 400px;margin: 0px auto;font-size: 40px">
+                fvm syscall
+            </div>
+        </div>
+        <div class="step1">
+            <div>第一步: 编写actor code -> src/lib.rs</div>
+
+            <div>第二步: 编译</div>
+            <button id="compile_fn" class="btn2" onclick="click_compile()">compile to wasm</button>
+            <div id="compile_result" class="hidden_div"></div>
+            <textarea readonly class="hidden_textarea" id="result_textarea"></textarea>
+
+            <div>第三步: 安装actor</div>
+            <button id="install_fn" class="btn2" onclick="click_install()">install actor</button>
+            <div id="install_result" class="hidden_div"></div>
+            <textarea readonly class="hidden_textarea_install" id="install_textarea"></textarea>
+
+            <div>第四步: 新建actor</div>
+            <button id="create_fn" class="btn2" onclick="click_create()">create actor</button>
+            <div id="create_result" class="hidden_div"></div>
+            <textarea readonly class="hidden_textarea_install" id="create_textarea"></textarea>
+
+            <div>辅助:设置actorId</div>
+            <label class="lb1">例:t01001</label>
+            <input class="txt1" id="actorId_v"/>
+            <button id="set_actor_id" class="btn2" onclick="set_actor_id()">设置actorId</button>
+        </div>
+        <div id="demo" class="step1">
+            <div class="b1">1 actor</div>
+            <!--1.1 start-->
+            <div class="b2">1.1 get_actor_code_cid</div>
+            <div class="d1">说明：通过地址获取actor的cid</div>
+            <pre class="p1">
+pub fn get_actor_code_cid(
+  context: Context<'_, impl Kernel>,
+  addr_off: u32, // Address
+  addr_len: u32,
+  obuf_off: u32, // Cid
+  obuf_len: u32,
+) -> Result&lt;i32&gt;
+            </pre>
+            <div>
+                <button id="get_actor_code_cid_id" class="btn1" onclick="click_get_actor_code_cid()">try it</button>
+                <label class="lb1">例:t01001</label>
+                <input class="txt1" id="actorId_balance"/>
+            </div>
+            <!--1.1 end-->
+            <!--1.2 start-->
+            <div class="b2">1.2 get_code_cid_for_type</div>
+            <div class="d1">说明：返回给定内置actor类型的 CodeCID</div>
+            <pre class="p1">
+pub fn get_code_cid_for_type(
+    context: Context<'_, impl Kernel>,
+    typ: i32,
+    obuf_off: u32, // Cid
+    obuf_len: u32,
+) -> Result&lt;i32&gt;
+            </pre>
+            <div>
+                <button id="get_code_cid_for_type_btn" class="btn1" onclick="get_code_cid_for_type()">try it</button>
+                <div id="get_code_cid_for_type_div"></div>
+                <div>
+                    <label class="lb1" id="get_code_cid_for_type_result"></label>
+                </div>
+            </div>
+            <!--1.2 end-->
+
+            <!--1.3 start-->
+            <div class="b2">1.3 new_actor_address</div>
+            <div class="d1">说明：生成新的actor address</div>
+            <pre class="p1">
+pub fn new_actor_address(
+    context: Context<'_, impl Kernel>,
+    obuf_off: u32, // Address (out)
+    obuf_len: u32,
+) -> Result&lt;i32&gt;
+            </pre>
+            <div>
+                <button id="new_actor_address" class="btn1" onclick="new_actor_address()">try it</button>
+                <div id="request_new_actor_address"></div>
+                <div>
+                    <label class="lb1" id="new_actor_address_result"></label>
+                </div>
+            </div>
+            <!--1.3 end-->
+
+            <!--1.4 start-->
+            <div class="b2">1.4 create_actor</div>
+            <div class="d1">说明：用Cid、actor_id生成actor</div>
+            <pre class="p1">
+pub fn create_actor(
+    context: Context<'_, impl Kernel>,
+    actor_id: u64, // Address
+    typ_off: u32,  // Cid
+) -> Result<()>
+            </pre>
+            <div>
+                <button id="create_actor_address_btn" class="btn1" onclick="create_actor_address()">try it</button>
+                <div id="create_actor_address_div"></div>
+                <div>
+                    <label class="lb1" id="create_actor_address_result"></label>
+                </div>
+            </div>
+            <!--1.4 end-->
+
+            <!--1.5 start-->
+            <div class="b2">1.5 resolve_builtin_actor_type</div>
+            <div class="d1">说明： 用Cid查询actor类型</div>
+            <pre class="p1">
+pub fn resolve_builtin_actor_type(
+    context: Context<'_, impl Kernel>,
+    code_cid_off: u32, // Cid
+) -> Result&lt;i32&gt;
+            </pre>
+            <div>
+                <button id="resolve_builtin_actor_type_btn" class="btn1" onclick="resolve_builtin_actor_type()">try it</button>
+                <div id="resolve_builtin_actor_type_div"></div>
+                <div>
+                    <label class="lb1" id="resolve_builtin_actor_type_result"></label>
+                </div>
+            </div>
+            <!--1.5 end-->
+
+            <!--1.6 start-->
+            <div class="b2">1.6 resolve_address</div>
+            <div class="d1">说明： 将任何协议的地址解析为ID地址(通过Init actor表)</div>
+            <pre class="p1">
+pub fn resolve_address(
+    context: Context<'_, impl Kernel>,
+    addr_off: u32, // Address
+    addr_len: u32,
+) -> Result&lt;sys::out::actor::ResolveAddress&gt;
+            </pre>
+            <div>
+                <button id="resolve_address_btn" class="btn1" onclick="resolve_address()">try it</button>
+                <div id="resolve_address_div"></div>
+                <div>
+                    <label class="lb1" id="resolve_address_result"></label>
+                </div>
+            </div>
+            <!--1.6 end-->
+
+
+        </div>
+
+
+        <div id="demo" class="step1">
+            <div class="b1">2 crypto</div>
+            <!--2.1 start-->
+            <div class="b2">2.1 verify_signature</div>
+            <div class="d1">说明：验证签名对于地址和明文是否有效。成功返回0，失败返回-1</div>
+            <pre class="p1">
+pub fn verify_signature(
+    mut context: Context<'_, impl Kernel>,
+    sig_off: u32, // Signature
+    sig_len: u32,
+    addr_off: u32, // Address
+    addr_len: u32,
+    plaintext_off: u32,
+    plaintext_len: u32,
+) -> Result&lt;i32&gt;
+                </pre>
+            <div>
+                <button id="verify_signature_btn" class="btn1" onclick="verify_signature()">try it</button>
+                <div id="verify_signature_div"></div>
+                <div>
+                    <label class="lb1" id="verify_signature_result"></label>
+                </div>
+            </div>
+            <!--2.1 end-->
+
+            <!--2.2 start-->
+            <div class="b2">2.2 hash_blake2b</div>
+            <div class="d1">说明：使用具有256位输出的blake2b散列输入数据。返回一个32字节的哈希摘要</div>
+            <pre class="p1">
+pub fn hash_blake2b(
+    mut context: Context<'_, impl Kernel>,
+    data_off: u32,
+    data_len: u32,
+) -> Result&lt;[u8; 32]&gt;
+                </pre>
+            <div>
+                <button id="hash_blake2b_btn" class="btn1" onclick="hash_blake2b()">try it</button>
+                <div id="hash_blake2b_div"></div>
+                <div>
+                    <label class="lb1" id="hash_blake2b_result"></label>
+                </div>
+            </div>
+            <!--2.2 end-->
+
+            <!--2.3 start-->
+            <div class="b2">2.3 compute_unsealed_sector_cid</div>
+            <div class="d1">说明：计算unsealed sector的cid</div>
+            <pre class="p1">
+pub fn compute_unsealed_sector_cid(
+    mut context: Context<'_, impl Kernel>,
+    proof_type: i64, // RegisteredSealProof,
+    pieces_off: u32, // [PieceInfo]
+    pieces_len: u32,
+    cid_off: u32,
+    cid_len: u32,
+) -> Result&lt;u32&gt;
+                </pre>
+            <div>
+                <button id="compute_unsealed_sector_cid_btn" class="btn1" onclick="compute_unsealed_sector_cid()">try it</button>
+                <div id="compute_unsealed_sector_cid_div"></div>
+                <div>
+                    <label class="lb1" id="compute_unsealed_sector_cid_result"></label>
+                </div>
+            </div>
+            <!--2.3 end-->
+
+            <!--2.4 start-->
+            <div class="b2">2.4 verify_seal</div>
+            <div class="d1">说明：验证seal proof；成功返回0，失败返回-1</div>
+            <pre class="p1">
+pub fn verify_seal(
+    mut context: Context<'_, impl Kernel>,
+    info_off: u32, // SealVerifyInfo
+    info_len: u32,
+) -> Result&lt;u32&gt;
+                </pre>
+            <div>
+                <button id="verify_seal_btn" class="btn1" onclick="verify_seal()">try it</button>
+                <div id="verify_seal_div"></div>
+                <div>
+                    <label class="lb1" id="verify_seal_result"></label>
+                </div>
+            </div>
+            <!--2.4 end-->
+
+            <!--2.5 start-->
+            <div class="b2">2.5 verify_post</div>
+            <div class="d1">说明：验证window proof；成功返回0，失败返回-1</div>
+            <pre class="p1">
+pub fn verify_post(
+    mut context: Context<'_, impl Kernel>,
+    info_off: u32, // WindowPoStVerifyInfo,
+    info_len: u32,
+) -> Result&lt;u32&gt;
+                </pre>
+            <div>
+                <button id="verify_post_btn" class="btn1" onclick="verify_post()">try it</button>
+                <div id="verify_post_div"></div>
+                <div>
+                    <label class="lb1" id="verify_post_result"></label>
+                </div>
+            </div>
+            <!--2.5 end-->
+
+            <!--2.6 start-->
+            <div class="b2">2.6 verify_consensus_fault</div>
+            <div class="d1">说明：验证两个block header是否提供了共识错误的证明</div>
+            <pre class="p1">
+pub fn verify_consensus_fault(
+    context: Context<'_, impl Kernel>,
+    h1_off: u32,
+    h1_len: u32,
+    h2_off: u32,
+    h2_len: u32,
+    extra_off: u32,
+    extra_len: u32,
+) -> Result&lt;sys::out::crypto::VerifyConsensusFault&gt;
+                </pre>
+            <div>
+                <button id="verify_consensus_fault_btn" class="btn1" onclick="verify_consensus_fault()">try it</button>
+                <div id="verify_consensus_fault_div"></div>
+                <div>
+                    <label class="lb1" id="verify_consensus_fault_result"></label>
+                </div>
+            </div>
+            <!--2.6 end-->
+
+            <!--2.7 start-->
+            <div class="b2">2.7 verify_aggregate_seals</div>
+            <div class="d1">说明：验证一批汇总扇区证明；成功返回0，失败返回-1</div>
+            <pre class="p1">
+pub fn verify_aggregate_seals(
+    mut context: Context<'_, impl Kernel>,
+    agg_off: u32, // AggregateSealVerifyProofAndInfos
+    agg_len: u32,
+) -> Result&lt;i32&gt;
+                </pre>
+            <div>
+                <button id="verify_aggregate_seals_btn" class="btn1" onclick="verify_aggregate_seals()">try it</button>
+                <div id="verify_aggregate_seals_div"></div>
+                <div>
+                    <label class="lb1" id="verify_aggregate_seals_result"></label>
+                </div>
+            </div>
+            <!--2.7 end-->
+
+            <!--2.8 start-->
+            <div class="b2">2.8 verify_replica_update</div>
+            <div class="d1">说明：验证replica更新证明；成功返回0，失败返回-1</div>
+            <pre class="p1">
+pub fn verify_replica_update(
+    mut context: Context<'_, impl Kernel>,
+    rep_off: u32, // ReplicaUpdateInfo
+    rep_len: u32,
+) -> Result&lt;i32&gt;
+                </pre>
+            <div>
+                <button id="verify_replica_update_btn" class="btn1" onclick="verify_replica_update()">try it</button>
+                <div id="verify_replica_update_div"></div>
+                <div>
+                    <label class="lb1" id="verify_replica_update_result"></label>
+                </div>
+            </div>
+            <!--2.8 end-->
+
+            <!--2.9 start-->
+            <div class="b2">2.9 batch_verify_seals</div>
+            <div class="d1">说明：批量验证seal</div>
+            <pre class="p1">
+pub fn batch_verify_seals(
+    mut context: Context<'_, impl Kernel>,
+    batch_off: u32,
+    batch_len: u32,
+    result_off: u32,
+) -> Result&lt;()&gt;
+                </pre>
+            <div>
+                <button id="batch_verify_seals_btn" class="btn1" onclick="batch_verify_seals()">try it</button>
+                <div id="batch_verify_seals_div"></div>
+                <div>
+                    <label class="lb1" id="batch_verify_seals_result"></label>
+                </div>
+            </div>
+            <!--2.9 end-->
+        </div>
+
+        <div id="demo" class="step1">
+            <div class="b1">3 debug</div>
+            <!--3.1 start-->
+            <div class="b2">3.1 log</div>
+            <div class="d1">说明： 日志</div>
+            <pre class="p1">
+pub fn log(
+    context: Context<'_, impl Kernel>,
+    msg_off: u32,
+    msg_len: u32
+) -> Result&lt;()&gt;
+                </pre>
+            <div>
+                <button id="log_btn" class="btn1" onclick="log()">try it</button>
+                <div id="log_div"></div>
+                <div>
+                    <label class="lb1" id="log_result"></label>
+                </div>
+            </div>
+            <!--3.1 end-->
+            <!--3.2 start-->
+            <div class="b2">3.2 enabled</div>
+            <div class="d1">说明： 日志开关</div>
+            <pre class="p1">
+pub fn enabled(
+    context: Context<'_, impl Kernel>
+) -> Result&lt;i32&gt;
+                </pre>
+            <div>
+                <button id="enabled_btn" class="btn1" onclick="enabled()">try it</button>
+                <div id="enabled_div"></div>
+                <div>
+                    <label class="lb1" id="enabled_result"></label>
+                </div>
+            </div>
+            <!--3.2 end-->
+        </div>
+
+        <div id="demo" class="step1">
+            <div class="b1">4 gas</div>
+            <!--4.1 start-->
+            <div class="b2">4.1 gas</div>
+            <div class="d1">说明： 按name收取gas费</div>
+            <pre class="p1">
+pub fn charge_gas(
+    context: Context<'_, impl Kernel>,
+    name_off: u32,
+    name_len: u32,
+    compute: i64,
+) -> Result&lt;()&gt;
+                </pre>
+            <div>
+                <button id="gas_btn" class="btn1" onclick="gas()">try it</button>
+                <div id="gas_div"></div>
+                <div>
+                    <label class="lb1" id="gas_result"></label>
+                </div>
+            </div>
+            <!--4.1 end-->
+        </div>
+
+        <div id="demo" class="step1">
+            <div class="b1">5 ipld</div>
+            <!--5.1 start-->
+            <div class="b2">5.1 open</div>
+            <div class="d1">说明： 打开一个block</div>
+            <pre class="p1">
+pub fn open(
+    context: Context<'_, impl Kernel>,
+    cid: u32
+) -> Result&lt;sys::out::ipld::IpldOpen&gt;
+            </pre>
+            <div>
+                <button id="open_btn" class="btn1" onclick="open()">try it</button>
+                <div id="open_div"></div>
+                <div>
+                    <label class="lb1" id="open_result"></label>
+                </div>
+            </div>
+            <!--5.1 end-->
+            <!--5.2 start-->
+            <div class="b2">5.2 create</div>
+            <div class="d1">说明： 创建一个新的block</div>
+            <pre class="p1">
+pub fn create(
+    context: Context<'_, impl Kernel>,
+    codec: u64,
+    data_off: u32,
+    data_len: u32,
+) -> Result&lt;u32&gt;
+            </pre>
+            <div>
+                <button id="create_btn" class="btn1" onclick="create()">try it</button>
+                <div id="create_div"></div>
+                <div>
+                    <label class="lb1" id="create_result"></label>
+                </div>
+            </div>
+            <!--5.2 end-->
+            <!--5.3 start-->
+            <div class="b2">5.3 cid</div>
+            <div class="d1">说明： 计算给定块的 CID，将生成的 CID 写入“cid”，返回 CID 的实际大小</div>
+            <pre class="p1">
+pub fn cid(
+    context: Context<'_, impl Kernel>,
+    id: u32,
+    hash_fun: u64,
+    hash_len: u32,
+    cid_off: u32,
+    cid_len: u32,
+) -> Result&lt;u32&gt;
+            </pre>
+            <div>
+                <button id="cid_btn" class="btn1" onclick="cid()">try it</button>
+                <div id="cid_div"></div>
+                <div>
+                    <label class="lb1" id="cid_result"></label>
+                </div>
+            </div>
+            <!--5.3 end-->
+
+            <!--5.4 start-->
+            <div class="b2">5.4 read</div>
+            <div class="d1">说明： 读取block</div>
+            <pre class="p1">
+pub fn read(
+    context: Context<'_, impl Kernel>,
+    id: u32,
+    offset: u32,
+    obuf_off: u32,
+    obuf_len: u32,
+) -> Result&lt;u32&gt;
+            </pre>
+            <div>
+                <button id="read_btn" class="btn1" onclick="read()">try it</button>
+                <div id="read_div"></div>
+                <div>
+                    <label class="lb1" id="read_result"></label>
+                </div>
+            </div>
+            <!--5.4 end-->
+
+            <!--5.5 start-->
+            <div class="b2">5.5 stat</div>
+            <div class="d1">说明： 返回blockStat(codec、size)</div>
+            <pre class="p1">
+pub fn stat(
+    context: Context<'_, impl Kernel>,
+    id: u32
+) -> Result&lt;sys::out::ipld::IpldStat&gt;
+            </pre>
+            <div>
+                <button id="stat_btn" class="btn1" onclick="stat()">try it</button>
+                <div id="stat_div"></div>
+                <div>
+                    <label class="lb1" id="stat_result"></label>
+                </div>
+            </div>
+            <!--5.5 end-->
+        </div>
+
+        <div id="demo" class="step1">
+            <div class="b1">6 message</div>
+            <!--6.1 start-->
+            <div class="b2">6.1 caller</div>
+            <div class="d1">说明： 返回调用者的actorId</div>
+            <pre class="p1">
+pub fn caller(
+    context: Context<'_, impl Kernel>
+) -> Result&lt;u64&gt
+            </pre>
+            <div>
+                <button id="caller_btn" class="btn1" onclick="caller()">try it</button>
+                <div id="caller_div"></div>
+                <div>
+                    <label class="lb1" id="caller_result"></label>
+                </div>
+            </div>
+            <!--6.1 end-->
+            <!--6.2 start-->
+            <div class="b2">6.2 receiver</div>
+            <div class="d1">说明： 返回接收者的actorId</div>
+            <pre class="p1">
+pub fn receiver(
+    context: Context<'_, impl Kernel>
+) -> Result&lt;u64&gt;
+            </pre>
+            <div>
+                <button id="receiver_btn" class="btn1" onclick="receiver()">try it</button>
+                <div id="receiver_div"></div>
+                <div>
+                    <label class="lb1" id="receiver_result"></label>
+                </div>
+            </div>
+            <!--6.2 end-->
+            <!--6.3 start-->
+            <div class="b2">6.3 method_number</div>
+            <div class="d1">说明： 返回message number</div>
+            <pre class="p1">
+pub fn method_number(
+    context: Context<'_, impl Kernel>
+) -> Result&lt;u64&gt;
+            </pre>
+            <div>
+                <button id="method_number_btn" class="btn1" onclick="method_number()">try it</button>
+                <div id="method_number_div"></div>
+                <div>
+                    <label class="lb1" id="method_number_result"></label>
+                </div>
+            </div>
+
+            <div class="b2">6.4 value_received</div>
+            <div class="d1">说明： 返回从 AttoFIL 中的调用方接收到的值</div>
+            <pre class="p1">
+pub fn value_received(
+    context: Context<'_, impl Kernel>
+) -> Result&lt;sys::TokenAmount&gt;
+            </pre>
+            <div>
+                <button id="value_received_btn" class="btn1" onclick="value_received()">try it</button>
+                <div id="value_received_div"></div>
+                <div>
+                    <label class="lb1" id="value_received_result"></label>
+                </div>
+            </div>
+        </div>
+
+        <div id="demo" class="step1">
+            <div class="b1">7 network</div>
+            <!--7.1 start-->
+            <div class="b2">7.1 curr_epoch</div>
+            <div class="d1">说明：返回当前网络的epoch</div>
+            <pre class="p1">
+pub fn curr_epoch(
+    context: Context<'_, impl Kernel>
+) -> Result&lt;i64&gt;
+            </pre>
+            <div>
+                <button id="curr_epoch_btn" class="btn1" onclick="curr_epoch()">try it</button>
+                <div id="curr_epoch_div"></div>
+                <div>
+                    <label class="lb1" id="curr_epoch_result"></label>
+                </div>
+            </div>
+
+            <div class="b2">7.2 version</div>
+            <div class="d1">说明： 返回当前网络的版本</div>
+            <pre class="p1">
+pub fn version(
+    context: Context<'_, impl Kernel>
+) -> Result&lt;u32&gt;
+            </pre>
+            <div>
+                <button id="version_btn" class="btn1" onclick="version()">try it</button>
+                <div id="version_div"></div>
+                <div>
+                    <label class="lb1" id="version_result"></label>
+                </div>
+            </div>
+
+            <div class="b2">7.3 base_fee</div>
+            <div class="d1">说明：返回当前的base_fee</div>
+            <pre class="p1">
+pub fn base_fee(
+    context: Context<'_, impl Kernel>
+) -> Result&lt;sys::TokenAmount&gt;
+            </pre>
+            <div>
+                <button id="base_fee_btn" class="btn1" onclick="base_fee()">try it</button>
+                <div id="base_fee_div"></div>
+                <div>
+                    <label class="lb1" id="base_fee_result"></label>
+                </div>
+            </div>
+
+            <div class="b2">7.4 total_fil_circ_supply</div>
+            <div class="d1">说明： 返回当前epoch开始时流通中的总代币供应量</div>
+            <pre class="p1">
+pub fn total_fil_circ_supply(
+    context: Context<'_, impl Kernel>
+) -> Result&lt;sys::TokenAmount&gt;
+            </pre>
+            <div>
+                <button id="total_fil_circ_supply_btn" class="btn1" onclick="total_fil_circ_supply()">try it</button>
+                <div id="total_fil_circ_supply_div"></div>
+                <div>
+                    <label class="lb1" id="total_fil_circ_supply_result"></label>
+                </div>
+            </div>
+        </div>
+
+        <div id="demo" class="step1">
+            <div class="b1">8 rand</div>
+            <div class="b2">8.1 get_chain_randomness</div>
+            <div class="d1">说明：从链上获取随机数</div>
+            <pre class="p1">
+pub fn get_chain_randomness(
+    context: Context<'_, impl Kernel>,
+    pers: i64,  // DomainSeparationTag
+    round: i64, // ChainEpoch
+    entropy_off: u32,
+    entropy_len: u32,
+) -> Result&lt;[u8; RANDOMNESS_LENGTH]&gt;
+            </pre>
+            <div>
+                <button id="get_chain_randomness_btn" class="btn1" onclick="get_chain_randomness()">try it</button>
+                <div id="get_chain_randomness_div"></div>
+                <div>
+                    <label class="lb1" id="get_chain_randomness_result"></label>
+                </div>
+            </div>
+
+            <div class="b2">8.2 get_beacon_randomness</div>
+            <div class="d1">说明： 从信标链上获取随机数</div>
+            <pre class="p1">
+pub fn get_beacon_randomness(
+    context: Context<'_, impl Kernel>,
+    pers: i64,  // DomainSeparationTag
+    round: i64, // ChainEpoch
+    entropy_off: u32,
+    entropy_len: u32,
+) -> Result&lt;[u8; RANDOMNESS_LENGTH]&gt;
+            </pre>
+            <div>
+                <button id="get_beacon_randomness_btn" class="btn1" onclick="get_beacon_randomness()">try it</button>
+                <div id="get_beacon_randomness_div"></div>
+                <div>
+                    <label class="lb1" id="get_beacon_randomness_result"></label>
+                </div>
+            </div>
+        </div>
+
+        <div id="demo" class="step1">
+            <div class="b1">9 send</div>
+            <div class="b2">9.1 send</div>
+            <div class="d1">说明：向另外一个actor发送消息</div>
+            <pre class="p1">
+pub fn send(
+    context: Context<'_, impl Kernel>,
+    recipient_off: u32,
+    recipient_len: u32,
+    method: u64,
+    params_id: u32,
+    value_hi: u64,
+    value_lo: u64,
+) -> Result&lt;sys::out::send::Send&gt;
+            </pre>
+            <div>
+                <button id="send_btn" class="btn1" onclick="send()">try it</button>
+                <div id="send_div"></div>
+                <div>
+                    <label class="lb1" id="send_result"></label>
+                </div>
+            </div>
+        </div>
+
+        <div id="demo" class="step1">
+            <div class="b1">10 sself</div>
+            <div class="b2">10.1 root</div>
+            <div class="d1">说明：返回actor状态的cid</div>
+            <pre class="p1">
+pub fn root(
+    context: Context<'_, impl Kernel>,
+    obuf_off: u32,
+    obuf_len: u32
+) -> Result&lt;u32&gt;
+            </pre>
+            <div>
+                <button id="root_btn" class="btn1" onclick="root()">try it</button>
+                <div id="root_div"></div>
+                <div>
+                    <label class="lb1" id="root_result"></label>
+                </div>
+            </div>
+
+            <div class="b2">10.2 set_root</div>
+            <div class="d1">说明：设置状态树的根</div>
+            <pre class="p1">
+pub fn set_root(
+    context: Context<'_, impl Kernel>,
+    cid_off: u32
+) -> Result&lt;()&gt;
+            </pre>
+            <div>
+                <button id="set_root_btn" class="btn1" onclick="set_root()">try it</button>
+                <div id="set_root_div"></div>
+                <div>
+                    <label class="lb1" id="set_root_result"></label>
+                </div>
+            </div>
+
+            <div class="b2">10.3 current_balance</div>
+            <div class="d1">说明：接收者的当前余额</div>
+            <pre class="p1">
+pub fn current_balance(
+    context: Context<'_, impl Kernel>
+) -> Result&lt;sys::TokenAmount&gt;
+            </pre>
+            <div>
+                <button id="current_balance_btn" class="btn1" onclick="current_balance()">try it</button>
+                <div id="current_balance_div"></div>
+                <div>
+                    <label class="lb1" id="current_balance_result"></label>
+                </div>
+            </div>
+
+            <div class="b2">10.4 self_destruct</div>
+            <div class="d1">说明：从状态树中删除执行参与者，将任何余额转移给受益人</div>
+            <pre class="p1">
+pub fn self_destruct(
+    context: Context<'_, impl Kernel>,
+    addr_off: u32,
+    addr_len: u32,
+) -> Result&lt;()&gt;
+            </pre>
+            <div>
+                <button id="self_destruct_btn" class="btn1" onclick="self_destruct()">try it</button>
+                <div id="set_root_div"></div>
+                <div>
+                    <label class="lb1" id="self_destruct_result"></label>
+                </div>
+            </div>
+        </div>
+
+        <div id="demo" class="step1">
+            <div class="b1">11 vm</div>
+            <div class="b2">11.1 abort</div>
+            <div class="d1">说明：中止</div>
+            <pre class="p1">
+pub fn abort(
+    context: Context<'_, impl Kernel>,
+    code: u32,
+    message_off: u32,
+    message_len: u32,
+) -> Result&lt;Never, Abort&gt;
+            </pre>
+            <div>
+                <button id="abort_btn" class="btn1" onclick="abort()">try it</button>
+                <div id="abort_div"></div>
+                <div>
+                    <label class="lb1" id="abort_result"></label>
+                </div>
+            </div>
+        </div>
+
+        <div class="step1">
+            <div class="b1">工具</div>
+            <button id="base64_test" class="btn1" onclick="base64_test()">try it</button>
+            <div><input class="txt1" id="base64_input"/></div>
+            <div id="base64_result"></div>
+        </div>
+
+    </body>
+</html>
