@@ -19,16 +19,19 @@
             <div>第二步: 编译</div>
             <button id="compile_fn" class="btn2" onclick="click_compile()">compile to wasm</button>
             <div id="compile_result" class="hidden_div"></div>
+            <div id="compile_timer_div" class="timer_div"></div>
             <textarea readonly class="hidden_textarea" id="result_textarea"></textarea>
 
             <div>第三步: 安装actor</div>
             <button id="install_fn" class="btn2" onclick="click_install()">install actor</button>
             <div id="install_result" class="hidden_div"></div>
+            <div class="timer_div"></div>
             <textarea readonly class="hidden_textarea_install" id="install_textarea"></textarea>
 
             <div>第四步: 新建actor</div>
             <button id="create_fn" class="btn2" onclick="click_create()">create actor</button>
-            <div id="create_result" class="hidden_div"></div>
+            <div id="create_actor_result" class="hidden_div"></div>
+            <div class="timer_div"></div>
             <textarea readonly class="hidden_textarea_install" id="create_textarea"></textarea>
 
             <div>辅助:设置actorId</div>
@@ -53,7 +56,12 @@ pub fn get_actor_code_cid(
             <div>
                 <button id="get_actor_code_cid_id" class="btn1" onclick="click_get_actor_code_cid()">try it</button>
                 <label class="lb1">例:t01001</label>
-                <input class="txt1" id="actorId_balance"/>
+                <input class="txt1" id="get_actor_code_cid_input"/>
+                <div id="get_actor_code_cid_div"></div>
+                <div class="timer_div"></div>
+                <div>
+                    <label class="lb1" id="get_actor_code_cid_result"></label>
+                </div>
             </div>
             <!--1.1 end-->
             <!--1.2 start-->
@@ -68,6 +76,19 @@ pub fn get_code_cid_for_type(
 ) -> Result&lt;i32&gt;
             </pre>
             <div>
+                <select id="actor_type">
+                    <option value="1">System</option>
+                    <option value="2">Init</option>
+                    <option value="3">Cron</option>
+                    <option value="4">Account</option>
+                    <option value="5">Power</option>
+                    <option value="6">Miner</option>
+                    <option value="7">Market</option>
+                    <option value="8">PaymentChannel</option>
+                    <option value="9">Multisig</option>
+                    <option value="10">Reward</option>
+                    <option value="11">VerifiedRegistry</option>
+                </select>
                 <button id="get_code_cid_for_type_btn" class="btn1" onclick="get_code_cid_for_type()">try it</button>
                 <div id="get_code_cid_for_type_div"></div>
                 <div>
@@ -107,6 +128,8 @@ pub fn create_actor(
             </pre>
             <div>
                 <button id="create_actor_address_btn" class="btn1" onclick="create_actor_address()">try it</button>
+                <input class="txt1" id="create_actor_actorId_input"/>
+                <input class="txt1" id="create_actor_cid_input"/>
                 <div id="create_actor_address_div"></div>
                 <div>
                     <label class="lb1" id="create_actor_address_result"></label>
@@ -125,6 +148,7 @@ pub fn resolve_builtin_actor_type(
             </pre>
             <div>
                 <button id="resolve_builtin_actor_type_btn" class="btn1" onclick="resolve_builtin_actor_type()">try it</button>
+                <input class="txt1" id="resolve_builtin_actor_type_input"/>
                 <div id="resolve_builtin_actor_type_div"></div>
                 <div>
                     <label class="lb1" id="resolve_builtin_actor_type_result"></label>
@@ -144,6 +168,7 @@ pub fn resolve_address(
             </pre>
             <div>
                 <button id="resolve_address_btn" class="btn1" onclick="resolve_address()">try it</button>
+                <input class="txt1" id="resolve_address_input"/>
                 <div id="resolve_address_div"></div>
                 <div>
                     <label class="lb1" id="resolve_address_result"></label>
@@ -155,7 +180,7 @@ pub fn resolve_address(
         </div>
 
 
-        <div id="demo" class="step1">
+        <div id="demo2" class="step1">
             <div class="b1">2 crypto</div>
             <!--2.1 start-->
             <div class="b2">2.1 verify_signature</div>
@@ -192,6 +217,7 @@ pub fn hash_blake2b(
                 </pre>
             <div>
                 <button id="hash_blake2b_btn" class="btn1" onclick="hash_blake2b()">try it</button>
+                <input class="txt1" id="hash_blake2b_input">
                 <div id="hash_blake2b_div"></div>
                 <div>
                     <label class="lb1" id="hash_blake2b_result"></label>
@@ -341,7 +367,7 @@ pub fn batch_verify_seals(
             <!--2.9 end-->
         </div>
 
-        <div id="demo" class="step1">
+        <div id="demo3" class="step1">
             <div class="b1">3 debug</div>
             <!--3.1 start-->
             <div class="b2">3.1 log</div>
@@ -354,7 +380,7 @@ pub fn log(
 ) -> Result&lt;()&gt;
                 </pre>
             <div>
-                <button id="log_btn" class="btn1" onclick="log()">try it</button>
+                <button id="log_btn" class="btn1" onclick="click_log()">try it</button>
                 <div id="log_div"></div>
                 <div>
                     <label class="lb1" id="log_result"></label>
@@ -363,14 +389,14 @@ pub fn log(
             <!--3.1 end-->
             <!--3.2 start-->
             <div class="b2">3.2 enabled</div>
-            <div class="d1">说明： 日志开关</div>
+            <div class="d1">说明： 日志是否可用</div>
             <pre class="p1">
 pub fn enabled(
     context: Context<'_, impl Kernel>
 ) -> Result&lt;i32&gt;
                 </pre>
             <div>
-                <button id="enabled_btn" class="btn1" onclick="enabled()">try it</button>
+                <button id="enabled_btn" class="btn1" onclick="click_enabled()">try it</button>
                 <div id="enabled_div"></div>
                 <div>
                     <label class="lb1" id="enabled_result"></label>
@@ -379,7 +405,7 @@ pub fn enabled(
             <!--3.2 end-->
         </div>
 
-        <div id="demo" class="step1">
+        <div id="demo4" class="step1">
             <div class="b1">4 gas</div>
             <!--4.1 start-->
             <div class="b2">4.1 gas</div>
@@ -393,7 +419,7 @@ pub fn charge_gas(
 ) -> Result&lt;()&gt;
                 </pre>
             <div>
-                <button id="gas_btn" class="btn1" onclick="gas()">try it</button>
+                <button id="gas_btn" class="btn1" onclick="click_gas()">try it</button>
                 <div id="gas_div"></div>
                 <div>
                     <label class="lb1" id="gas_result"></label>
@@ -402,7 +428,7 @@ pub fn charge_gas(
             <!--4.1 end-->
         </div>
 
-        <div id="demo" class="step1">
+        <div id="demo5" class="step1">
             <div class="b1">5 ipld</div>
             <!--5.1 start-->
             <div class="b2">5.1 open</div>
@@ -414,7 +440,8 @@ pub fn open(
 ) -> Result&lt;sys::out::ipld::IpldOpen&gt;
             </pre>
             <div>
-                <button id="open_btn" class="btn1" onclick="open()">try it</button>
+                <button id="open_btn" class="btn1" onclick="click_open()">try it</button>
+                <input class="txt1" id="open_input">
                 <div id="open_div"></div>
                 <div>
                     <label class="lb1" id="open_result"></label>
@@ -433,10 +460,11 @@ pub fn create(
 ) -> Result&lt;u32&gt;
             </pre>
             <div>
-                <button id="create_btn" class="btn1" onclick="create()">try it</button>
-                <div id="create_div"></div>
+                <button id="ipld_create_btn" class="btn1" onclick="click_ipld_create()">try it</button>
+                <input class="txt1" id="ipld_create_input">
+                <div id="ipld_create_div"></div>
                 <div>
-                    <label class="lb1" id="create_result"></label>
+                    <label class="lb1" id="ipld_create_result"></label>
                 </div>
             </div>
             <!--5.2 end-->
@@ -454,7 +482,8 @@ pub fn cid(
 ) -> Result&lt;u32&gt;
             </pre>
             <div>
-                <button id="cid_btn" class="btn1" onclick="cid()">try it</button>
+                <button id="cid_btn" class="btn1" onclick="click_cid()">try it</button>
+                <input class="txt1" id="cid_input">
                 <div id="cid_div"></div>
                 <div>
                     <label class="lb1" id="cid_result"></label>
@@ -475,7 +504,8 @@ pub fn read(
 ) -> Result&lt;u32&gt;
             </pre>
             <div>
-                <button id="read_btn" class="btn1" onclick="read()">try it</button>
+                <button id="read_btn" class="btn1" onclick="click_read()">try it</button>
+                <input class="txt1" id="read_input">
                 <div id="read_div"></div>
                 <div>
                     <label class="lb1" id="read_result"></label>
@@ -493,7 +523,8 @@ pub fn stat(
 ) -> Result&lt;sys::out::ipld::IpldStat&gt;
             </pre>
             <div>
-                <button id="stat_btn" class="btn1" onclick="stat()">try it</button>
+                <button id="stat_btn" class="btn1" onclick="click_stat()">try it</button>
+                <input class="txt1" id="stat_input">
                 <div id="stat_div"></div>
                 <div>
                     <label class="lb1" id="stat_result"></label>
@@ -502,7 +533,7 @@ pub fn stat(
             <!--5.5 end-->
         </div>
 
-        <div id="demo" class="step1">
+        <div id="demo6" class="step1">
             <div class="b1">6 message</div>
             <!--6.1 start-->
             <div class="b2">6.1 caller</div>
@@ -513,7 +544,7 @@ pub fn caller(
 ) -> Result&lt;u64&gt
             </pre>
             <div>
-                <button id="caller_btn" class="btn1" onclick="caller()">try it</button>
+                <button id="caller_btn" class="btn1" onclick="click_caller()">try it</button>
                 <div id="caller_div"></div>
                 <div>
                     <label class="lb1" id="caller_result"></label>
@@ -529,7 +560,7 @@ pub fn receiver(
 ) -> Result&lt;u64&gt;
             </pre>
             <div>
-                <button id="receiver_btn" class="btn1" onclick="receiver()">try it</button>
+                <button id="receiver_btn" class="btn1" onclick="click_receiver()">try it</button>
                 <div id="receiver_div"></div>
                 <div>
                     <label class="lb1" id="receiver_result"></label>
@@ -561,6 +592,8 @@ pub fn value_received(
             </pre>
             <div>
                 <button id="value_received_btn" class="btn1" onclick="value_received()">try it</button>
+                <label>msg:value</label>
+                <input class="txt1" id="value_input">
                 <div id="value_received_div"></div>
                 <div>
                     <label class="lb1" id="value_received_result"></label>
@@ -568,7 +601,7 @@ pub fn value_received(
             </div>
         </div>
 
-        <div id="demo" class="step1">
+        <div id="demo7" class="step1">
             <div class="b1">7 network</div>
             <!--7.1 start-->
             <div class="b2">7.1 curr_epoch</div>
@@ -594,7 +627,7 @@ pub fn version(
 ) -> Result&lt;u32&gt;
             </pre>
             <div>
-                <button id="version_btn" class="btn1" onclick="version()">try it</button>
+                <button id="version_btn" class="btn1" onclick="click_version()">try it</button>
                 <div id="version_div"></div>
                 <div>
                     <label class="lb1" id="version_result"></label>
@@ -632,7 +665,7 @@ pub fn total_fil_circ_supply(
             </div>
         </div>
 
-        <div id="demo" class="step1">
+        <div id="demo8" class="step1">
             <div class="b1">8 rand</div>
             <div class="b2">8.1 get_chain_randomness</div>
             <div class="d1">说明：从链上获取随机数</div>
@@ -646,6 +679,17 @@ pub fn get_chain_randomness(
 ) -> Result&lt;[u8; RANDOMNESS_LENGTH]&gt;
             </pre>
             <div>
+                <select id="domain_tag">
+                    <option value="1">TicketProduction</option>
+                    <option value="2">ElectionProofProduction</option>
+                    <option value="3">WinningPoStChallengeSeed</option>
+                    <option value="4">WindowedPoStChallengeSeed</option>
+                    <option value="5">SealRandomness</option>
+                    <option value="6">InteractiveSealChallengeSeed</option>
+                    <option value="7">WindowPoStDeadlineAssignment</option>
+                    <option value="8">MarketDealCronSeed</option>
+                    <option value="9">PoStChainCommit</option>
+                </select>
                 <button id="get_chain_randomness_btn" class="btn1" onclick="get_chain_randomness()">try it</button>
                 <div id="get_chain_randomness_div"></div>
                 <div>
@@ -665,6 +709,17 @@ pub fn get_beacon_randomness(
 ) -> Result&lt;[u8; RANDOMNESS_LENGTH]&gt;
             </pre>
             <div>
+                <select id="domain_tag2">
+                    <option value="1">TicketProduction</option>
+                    <option value="2">ElectionProofProduction</option>
+                    <option value="3">WinningPoStChallengeSeed</option>
+                    <option value="4">WindowedPoStChallengeSeed</option>
+                    <option value="5">SealRandomness</option>
+                    <option value="6">InteractiveSealChallengeSeed</option>
+                    <option value="7">WindowPoStDeadlineAssignment</option>
+                    <option value="8">MarketDealCronSeed</option>
+                    <option value="9">PoStChainCommit</option>
+                </select>
                 <button id="get_beacon_randomness_btn" class="btn1" onclick="get_beacon_randomness()">try it</button>
                 <div id="get_beacon_randomness_div"></div>
                 <div>
@@ -673,7 +728,7 @@ pub fn get_beacon_randomness(
             </div>
         </div>
 
-        <div id="demo" class="step1">
+        <div id="demo9" class="step1">
             <div class="b1">9 send</div>
             <div class="b2">9.1 send</div>
             <div class="d1">说明：向另外一个actor发送消息</div>
@@ -689,7 +744,19 @@ pub fn send(
 ) -> Result&lt;sys::out::send::Send&gt;
             </pre>
             <div>
-                <button id="send_btn" class="btn1" onclick="send()">try it</button>
+                <button id="send_btn" class="btn1" onclick="click_send()">try it</button>
+                <div>
+                    <label class="lb1">actor  :&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                    <input class="txt1" id="send_actor_input">
+                </div>
+                <div>
+                    <label class="lb1">method:</label>
+                    <input class="txt1" id="send_method_input">
+                </div>
+                <div>
+                    <label class="lb1">amount:</label>
+                    <input class="txt1" id="send_amount_input">
+                </div>
                 <div id="send_div"></div>
                 <div>
                     <label class="lb1" id="send_result"></label>
@@ -697,7 +764,7 @@ pub fn send(
             </div>
         </div>
 
-        <div id="demo" class="step1">
+        <div id="demo10" class="step1">
             <div class="b1">10 sself</div>
             <div class="b2">10.1 root</div>
             <div class="d1">说明：返回actor状态的cid</div>
@@ -709,7 +776,7 @@ pub fn root(
 ) -> Result&lt;u32&gt;
             </pre>
             <div>
-                <button id="root_btn" class="btn1" onclick="root()">try it</button>
+                <button id="root_btn" class="btn1" onclick="click_root()">try it</button>
                 <div id="root_div"></div>
                 <div>
                     <label class="lb1" id="root_result"></label>
@@ -725,7 +792,8 @@ pub fn set_root(
 ) -> Result&lt;()&gt;
             </pre>
             <div>
-                <button id="set_root_btn" class="btn1" onclick="set_root()">try it</button>
+                <button id="set_root_btn" class="btn1" onclick="click_set_root()">try it</button>
+                <input class="txt1" id="set_root_input">
                 <div id="set_root_div"></div>
                 <div>
                     <label class="lb1" id="set_root_result"></label>
@@ -741,6 +809,8 @@ pub fn current_balance(
             </pre>
             <div>
                 <button id="current_balance_btn" class="btn1" onclick="current_balance()">try it</button>
+                <button id="transfer_btn" class="btn1" onclick="transfer()">加钱</button>
+                <input class="txt1" id="transfer_amt">
                 <div id="current_balance_div"></div>
                 <div>
                     <label class="lb1" id="current_balance_result"></label>
@@ -758,14 +828,15 @@ pub fn self_destruct(
             </pre>
             <div>
                 <button id="self_destruct_btn" class="btn1" onclick="self_destruct()">try it</button>
-                <div id="set_root_div"></div>
+                <input class="txt1" id="self_destruct_input">
+                <div id="self_destruct_div"></div>
                 <div>
                     <label class="lb1" id="self_destruct_result"></label>
                 </div>
             </div>
         </div>
 
-        <div id="demo" class="step1">
+        <div id="demo11" class="step1">
             <div class="b1">11 vm</div>
             <div class="b2">11.1 abort</div>
             <div class="d1">说明：中止</div>
@@ -778,7 +849,7 @@ pub fn abort(
 ) -> Result&lt;Never, Abort&gt;
             </pre>
             <div>
-                <button id="abort_btn" class="btn1" onclick="abort()">try it</button>
+                <button id="abort_btn" class="btn1" onclick="click_abort()">try it</button>
                 <div id="abort_div"></div>
                 <div>
                     <label class="lb1" id="abort_result"></label>
@@ -788,9 +859,13 @@ pub fn abort(
 
         <div class="step1">
             <div class="b1">工具</div>
-            <button id="base64_test" class="btn1" onclick="base64_test()">try it</button>
-            <div><input class="txt1" id="base64_input"/></div>
-            <div id="base64_result"></div>
+            <button id="base64_encode" class="btn2" onclick="base64_encode()">base64 encode</button>
+            <div><input class="txt1" id="base64_encode_input"/></div>
+            <div id="base64_encode_result"></div>
+
+            <button id="base64_decode" class="btn2" onclick="base64_decode()">base64 decode</button>
+            <div><input class="txt1" id="base64_decode_input"/></div>
+            <div id="base64_decode_result"></div>
         </div>
 
     </body>
